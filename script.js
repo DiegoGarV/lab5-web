@@ -21,6 +21,15 @@ namePerfilIntegrante.textContent = 'Generico';
 let contenidoChat = document.createElement('div');
 contenidoChat.id = 'mensajes';
 
+//Auto scroll para los chats
+let contenedorScroll = document.getElementById('mensajes');
+
+//Define los mensajes recibidos
+let chat;
+
+//Define los mensajes enviados
+let mensajeEnviado;
+
 //Crea el espacio para el nombre y la imagen del perfil
 let contenidoPerfil = document.createElement('div');
 contenidoPerfil.id = 'contenido-perfil';
@@ -56,7 +65,7 @@ botonEnviar.textContent = 'Enviar';
 
 //Estilo del contenedor
 contenedor.style.backgroundColor = 'white';
-contenedor.style.height = '100vh';
+contenedor.style.height = '97vh';
 contenedor.style.display = 'grid';
 contenedor.style.fontFamily = 'Times New Roman';
 contenedor.style.border = '1px solid black';
@@ -69,7 +78,8 @@ listadoPersonas.style.border = '1px solid black';
 listadoPersonas.style.padding = '5px';
 listadoPersonas.style.display = 'flex';
 listadoPersonas.style.flexDirection = 'column';
-listadoPersonas.style.overflow = 'scroll';
+listadoPersonas.style.overflowY = 'scroll';
+listadoPersonas.style.overflowX = 'hidden';
 
 //Estilo del espacio individual del integrante
 contenedorIntegrante.style.width = "100%";
@@ -99,13 +109,14 @@ imagenPerfil.style.marginRight = '8px';
 namePerfil.style.marginRight = '20px';
 
 //Estilo del boton de cambiar modos entre claro y oscuro
-botonModo.style.backgroundColor = '#4e4e4';
+botonModo.style.backgroundColor = '##D5DBDB';
 
 //Estilo del area donde se muestran los chats
 contenidoChat.style.backgroundColor = '#ffcc00';
 contenidoChat.style.border = '1px solid black';
 contenidoChat.style.padding = '8px';
-contenidoChat.style.overflow = 'scroll';
+contenidoChat.style.overflowY = 'scroll';
+contenidoChat.style.overflowX = 'hidden';
 
 //Estilo de la barra de escritura
 mensaje.style.backgroundColor = '#ffcc99';
@@ -119,7 +130,7 @@ escribirMensaje.style.width = '93%'
 escribirMensaje.style.backgroundColor = 'white';
 
 //Estilo del botón para enviar mensaje
-botonEnviar.style.backgroundColor = '#4e4e4';
+botonEnviar.style.backgroundColor = '##D5DBDB';
 
 //Agrega los textos
 document.body.appendChild(contenedor);
@@ -192,7 +203,8 @@ async function crearMensajes(){
         // recorremos los nuevos chats y los agremos al div de listados
         .forEach(element => {
             //Crea los mensajes dentro del chat
-            let chat = document.createElement('div');
+            chat = document.createElement('div')
+            chat.className = 'mensaje-chat';
             chat.id = 'chat';
             chat.style.backgroundColor = 'lightblue';
             chat.style.width = '50%';
@@ -205,30 +217,46 @@ async function crearMensajes(){
             chat.appendChild(element);
             contenidoChat.appendChild(chat);
         });
+        if (contenidoChat !== null) {
+            contenidoChat.scrollTop = contenidoChat.scrollHeight;
+        }
     }
-
 }
+
+
 
 //Función para mandar el mensaje
 function enviarMensaje(){
     let contenidoMensaje = document.getElementById('mensaje-chat').value;
 
-    let mensajeEnviado = document.createElement('div');
-    mensajeEnviado.style.backgroundColor = 'lightgreen';
+    mensajeEnviado = document.createElement('div');
+    mensajeEnviado.className = 'mensaje-enviado';
+    if (!modoClaro) {
+        mensajeEnviado.style.backgroundColor = '#1D8348';
+    }
+    else{
+        mensajeEnviado.style.backgroundColor = 'lightgreen';
+    }
     mensajeEnviado.style.width = '50%';
     mensajeEnviado.style.minHeight = '40px';
     mensajeEnviado.style.borderRadius = '8px';
     mensajeEnviado.style.border = '1px solid black';
     mensajeEnviado.style.padding = '8px';
     mensajeEnviado.style.marginBottom = '8px';
-
     mensajeEnviado.innerHTML = contenidoMensaje;
     
+    if (!modoClaro) {
+        mensajeEnviado.classList.add('oscuro');
+    }
+
     contenidoChat.appendChild(mensajeEnviado)
 
     animacionEntrada(mensajeEnviado,0);
 
-    
+    if (contenidoChat !== null) {
+        contenidoChat.scrollTop = contenidoChat.scrollHeight;
+    }
+
     escribirMensaje.value = '';
 }
 
@@ -249,30 +277,57 @@ function animacionEntrada(texto,distancia) {
 let modoClaro = true;
 function cambiarModo(){
     modoClaro = !modoClaro;
+    localStorage.setItem('modoClaro', modoClaro);
 
     const colores = modoClaro
-        ? { contenedor: 'white', texto: '', listadoPersonas: '#ff9900', contenidoChat: '#ffcc00', contenidoPerfil: '#ff6600', mensaje:'#ffcc99', botones:'#4e4e4', enviados: 'lightgreen', recibidos: 'lightblue', leyendaBotonCambio: 'Oscuro'}
-        : { contenedor: '#909497', texto: '', listadoPersonas: '#9C640C', contenidoChat: '#9A7D0A', contenidoPerfil: '#935116', mensaje:'#B9770E', botones:'#626567',  enviados: '#1D8348', recibidos: '#1B4F72', leyendaBotonCambio: 'Claro'};
+        ? { contenedor: 'white', texto: 'black', listadoPersonas: '#ff9900', contenidoChat: '#ffcc00', contenidoPerfil: '#ff6600', mensaje:'#ffcc99', botones:'#D5DBDB', enviados: 'lightgreen', recibidos: 'lightblue', leyendaBotonCambio: 'Oscuro'}
+        : { contenedor: '#909497', texto: '#F2F3F4', listadoPersonas: '#9C640C', contenidoChat: '#9A7D0A', contenidoPerfil: '#935116', mensaje:'#B9770E', botones:'#797D7F',  enviados: '#1D8348', recibidos: '#1B4F72', leyendaBotonCambio: 'Claro'};
 
-    aplicarCambio();
-    //console.log('Nuevo modo:', modoClaro ? 'Claro' : 'Oscuro');
-}
-
-function aplicarCambio(){
     contenedor.style.backgroundColor = colores.contenedor;
     listadoPersonas.style.backgroundColor = colores.listadoPersonas;
+    listadoPersonas.style.color = colores.texto;
     mensaje.style.backgroundColor = colores.mensaje;
+    mensaje.style.color = colores.texto;
     contenidoChat.style.backgroundColor = colores.contenidoChat;
+    contenidoChat.style.color = colores.texto;
+    contenidoPerfil.style.backgroundColor = colores.contenidoPerfil;
+    contenidoPerfil.style.color = colores.texto;
     escribirMensaje.style.backgroundColor = colores.contenedor;
+    escribirMensaje.style.color = colores.texto;
     botonEnviar.style.backgroundColor = colores.botones;
+    botonEnviar.style.color = colores.texto;
     botonModo.style.backgroundColor = colores.botones;
+    botonModo.style.color = colores.texto;
     botonModo.textContent = colores.leyendaBotonCambio;
-    chat.style.backgroundColor = colores.recibidos
-    mensajeEnviado.style.backgroundColor = colores.enviados 
+    let mensajesRecibidos = document.getElementsByClassName('mensaje-chat');
+    for (let i = 0; i < mensajesRecibidos.length; i++) {
+        mensajesRecibidos[i].style.backgroundColor = colores.recibidos;
+    }
+    let mensajesEnviados = document.getElementsByClassName('mensaje-enviado');
+    for (let i = 0; i < mensajesEnviados.length; i++) {
+        mensajesEnviados[i].style.backgroundColor = colores.enviados;
+    }
 }
+
+//Aplica el localstorage al cargar
+window.onload = function() {
+    let modoGuardado = localStorage.getItem('modoClaro');
+    if (modoGuardado !== null) {
+        modoClaro = modoGuardado === 'true';
+        cambiarModo();
+    }
+};
 
 //Acción del botón para mandar el mensaje
 botonEnviar.addEventListener('click', enviarMensaje)
+
+//Acción de enter para mandar el mensaje
+escribirMensaje.addEventListener("keydown", function(event){
+    if(event.keyCode === 13){
+        event.preventDefault();
+        enviarMensaje();
+    }
+});
 
 //Acción del botón para cambiar modo entre claro y oscuro
 botonModo.addEventListener('click', cambiarModo);
